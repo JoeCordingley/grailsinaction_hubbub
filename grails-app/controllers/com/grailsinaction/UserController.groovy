@@ -14,4 +14,6 @@ class UserController {
                     term: params.loginId,
                     totalUsers: User.count() ]
     }
+
+
 }
