@@ -10,5 +10,21 @@ class UrlMappings {
         "/"(view:"/index")
         "500"(view:'/error')
         "404"(view:'/notFound')
+
+        "/timeline/chuck_norris" {
+            controller = "post"
+            action = "timeline"
+            id="chuck_norris"
+        }
+
+        "/users/$id" {
+            controller = "post"
+            action = "timeline"
+        }
+
+        "/timeline" {
+            controller = "post"
+            action = "personal"
+        }
     }
 }

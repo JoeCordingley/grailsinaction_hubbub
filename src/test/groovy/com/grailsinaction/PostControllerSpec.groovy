@@ -3,6 +3,7 @@ package com.grailsinaction
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Specification
+import spock.lang.Unroll
 
 /**
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
@@ -45,7 +46,7 @@ class PostControllerSpec extends Specification {
         then: "a 404 is sent to the browser"
         response.status == 404
     }
-    def "Adding a valid new post to the timeline"(){
+    /*def "Adding a valid new post to the timeline"(){
         given: "A  user with posts in the db"
         User chuck = new User(
                 loginId: "chuck_norris",
@@ -67,6 +68,19 @@ class PostControllerSpec extends Specification {
         response.redirectedUrl == "/post/timeline/${chuck.loginId}"
         Post.countByUser(chuck) ==1
 
+    }*/
+    def "Adding a valid new post to the timeline"(){
+        given: "a mock post service"
+        def mockPostService = Mock(PostService)
+        1 * mockPostService.createPost(_,_) >> new Post(content: "Mock Post")
+        controller.postService = mockPostService
+
+        when: "controller is invoked"
+        def result = controller.addPost( "joe_cool", "Posting up a storm")
+
+        then: "redirected to timeline, flas message tells us all is well"
+        flash.message ==~ /Added new post: Mock.*/
+        response.redirectedUrl == '/post/timeline/joe_cool'
     }
     def "Adding an empty post to the timeline"(){
         given: "A  user with posts in the db"
@@ -90,5 +104,22 @@ class PostControllerSpec extends Specification {
         Post.countByUser(chuck) ==0
 
 
+    }
+    @Unroll
+    def "Testing id of #suppliedId redirects to #expectedUrl"(){
+
+        given:
+        params.id = suppliedId
+
+        when: "Controller is invoked"
+        controller.home()
+
+        then:
+        response.redirectedUrl == expectedUrl
+
+        where:
+        suppliedId | expectedUrl
+        'joe_cool' | '/post/timeline/joe_cool'
+        null | '/post/timeline/chuck_norris'
     }
 }
